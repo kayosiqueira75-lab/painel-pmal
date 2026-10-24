@@ -429,6 +429,30 @@
       .column.active-mobile { display: flex; }
     }
   </style>
+/* ESTILO DO CRONÔMETRO DE ESTUDOS */
+.timer-card {
+  background-color: #131d31;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.timer-display {
+  font-size: 1.8rem;
+  font-weight: 800;
+  font-family: 'Courier New', Courier, monospace;
+  color: var(--accent);
+  letter-spacing: 2px;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 0.4rem;
+}
 </head>
 <body>
 
@@ -501,6 +525,17 @@
 
     <!-- RIGHT COLUMN -->
     <div class="column column-right" id="col-right">
+<!-- CARD DO CRONÔMETRO INTEGRADO -->
+<div class="timer-card">
+  <div>
+    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">⏱️ Horas Líquidas de Estudo</span>
+    <div class="timer-display" id="timer-display">00:00:00</div>
+  </div>
+  <div class="timer-controls">
+    <button class="btn-accent" id="btn-timer-start" onclick="toggleTimer()">▶ Iniciar</button>
+    <button onclick="resetTimer()">⏹ Zerar</button>
+  </div>
+</div>
       <div class="section-header">
         <h2>📈 Painel de Domínio & Fila de Acompanhamento</h2>
       </div>
@@ -655,6 +690,45 @@
   </div>
 
   <script>
+/* LÓGICA DO CRONÔMETRO */
+let timerInterval = null;
+let timerSeconds = 0;
+
+function updateTimerDisplay() {
+  const hrs = Math.floor(timerSeconds / 3600).toString().padStart(2, '0');
+  const mins = Math.floor((timerSeconds % 3600) / 60).toString().padStart(2, '0');
+  const secs = (timerSeconds % 60).toString().padStart(2, '0');
+  document.getElementById('timer-display').innerText = `${hrs}:${mins}:${secs}`;
+}
+
+function toggleTimer() {
+  const btn = document.getElementById('btn-timer-start');
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    btn.innerText = '▶ Continuar';
+    btn.classList.add('btn-accent');
+  } else {
+    timerInterval = setInterval(() => {
+      timerSeconds++;
+      updateTimerDisplay();
+    }, 1000);
+    btn.innerText = '⏸ Pausar';
+    btn.classList.remove('btn-accent');
+  }
+}
+
+function resetTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  timerSeconds = 0;
+  updateTimerDisplay();
+  const btn = document.getElementById('btn-timer-start');
+  btn.innerText = '▶ Iniciar';
+  btn.classList.add('btn-accent');
+}
     const STORAGE_KEY = 'pmal_cronograma_painel_v1';
 
     const schedulePhases = {
